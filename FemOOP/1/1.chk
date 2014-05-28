@@ -1,0 +1,64 @@
+Project file located at 1\1
+Current Time 2014-4-12  17:05:38
+Current Time 2014-4-12  17:05:38
+Current Time 2014-4-12  17:05:38
+Current Time 2014-4-12  17:05:40
+               istep         0           iteration         1
+         Load Error=   -1.#IND
+Current Time 2014-4-12  17:05:42
+     Index          Dispx          Dispy          Dispz
+         0              0              0
+         1              0              0
+         2              0              0
+         3              0              0
+         4              0              0
+         5              0              0
+         6              0              0
+         7              0              0
+         8              0              0
+     Index          Dispx          Dispy          Dispz
+         0              0              0
+         1              0              0
+         2              0              0
+         3              0              0
+         4              0              0
+         5              0              0
+         6              0              0
+         7              0              0
+         8              0              0
+     Index       StressXX       StressYY       StressXY
+         0              0              0              0
+         1              0              0              0
+         2              0              0              0
+         3              0              0              0
+Current Time 2014-4-12  17:05:42
+Current Time 2014-4-12  17:05:42
+               istep         1           iteration         1
+         Load Error=1.0851e-031
+Current Time 2014-4-12  17:05:44
+     Index          Dispx          Dispy          Dispz
+         0              0              0
+         1  -9.57334e-022              0
+         2              0              0
+         3              0  -1.99294e-005
+         4  -5.81576e-022  -3.00706e-005
+         5              0  -1.99294e-005
+         6              0  -2.30892e-005
+         7   2.34849e-021  -2.69108e-005
+         8              0  -2.30892e-005
+     Index          Dispx          Dispy          Dispz
+         0              0              0
+         1  -9.57334e-022        -5e-005
+         2              0              0
+         3              0  -1.99294e-005
+         4  -5.81576e-022  -3.00706e-005
+         5              0  -1.99294e-005
+         6              0  -2.30892e-005
+         7   2.34849e-021  -2.69108e-005
+         8              0  -2.30892e-005
+     Index       StressXX       StressYY       StressXY
+         0   1.87128e-013   3.69712e-012       -9018.59
+         1   9.59473e-013   2.02216e-012        9018.59
+         2     1.045e-012    2.0393e-012       -2093.81
+         3    -1.045e-012   -2.0393e-012        2093.81
+Current Time 2014-4-12  17:05:44

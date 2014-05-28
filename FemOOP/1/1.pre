@@ -1,0 +1,25 @@
+npre
+1
+FixBoundary
+2
+dir,npoint
+1 6 
+1 4 7 3 6 9
+dir,npoint
+2 3
+1 2 3
+npre
+2
+FixBoundary
+2
+dir,npoint
+1 6 
+1 4 7 3 6 9
+dir,npoint
+2 3
+1 2 3
+Displacement
+ 1
+dir value npoint
+ 2   -5e-5   1
+ 2 2 3

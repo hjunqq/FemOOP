@@ -1,0 +1,12 @@
+exe "C:\Users\huijun\Documents\Visual Studio 2013\Projects\FemOOP\FemOOP\3\FemOOP.exe"
+n 2
+wdir C:\Users\huijun\Documents\Visual Studio 2013\Projects\FemOOP\FemOOP\3
+hosts 
+cfg 
+mpich1 
+env 
+map 
+channel default
+extra 
+window yes
+log no

@@ -1,0 +1,14 @@
+nloa,nface£¬nbody£¬ncent
+3 0 0 1
+ntype
+body
+Dir,Acceleration,nGroup
+ 2       -9.81      1
+Group
+1
+ntype
+cent
+Nnode,Dir,Value
+1      2  -1000000
+Node 
+25
