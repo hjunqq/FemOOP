@@ -290,17 +290,17 @@ int FEMOOP::Solve(int istep)
 					{
 						InteractResult[inode * 2 + idim] = 0;
 					}
-					cout << InteractResult[inode * 2 + idim] << endl;
+					cout << InteractResult[inode * 2 + 1] << endl;
 				}
 			}
 			tag1 = 1;
 			tag2 = 2;
-			//MPI::COMM_WORLD.Isend(InteractResult, InteractnNode*ndim, MPI::DOUBLE, 0, tag);
-			//MPI::COMM_WORLD.Irecv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, 0, tag);
-			MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
-			MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
-			MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
-			MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
+			//MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
+			//MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
+			//MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
+			//MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
+			//MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
+			//MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
 			//InteractNode = Pres[istep].GetNode(iInteract);
 			//for (int inode = 0; inode < InteractnNode; inode++)
 			//{
@@ -312,21 +312,23 @@ int FEMOOP::Solve(int istep)
 			//}
 			for (int inode = 0; inode < InteractnNode; inode++)
 			{
-				cout << InteractResult[inode] << setw(10)<<myid<<endl;
+				//cout << InteractResult[inode] << setw(10)<<myid<<endl;
 			}
 			for (int inode = 0; inode < InteractnNode; inode++)
 			{
-				int NodeIndex = InteractNode[inode];
-				for (int idim = 0; idim < ndim; idim++)
-				{
+				int NodeIndex = InteractNode[inode]; 
+				int idim = 1;
+				//for (int idim = 0; idim < ndim; idim++)
+				//{
 					InteractResult[inode * 2 + idim] = -InteractResult[inode * 2 + idim];
+					InteractResult[inode * 2] = 0;
 						//-= (InteractResult[inode * 2 + idim] - InteractReceive[inode * 2 + idim]) / 2;
-					cout << InteractResult[inode * 2 + idim]<<endl;
-				}
+					//cout << InteractResult[inode * 2 + idim]<<endl;
+				//}
 			}
 			for (int inode = 0; inode < InteractnNode; inode++)
 			{
-				cout << InteractResult[inode] << setw(10) << myid << endl;
+				//cout << InteractResult[inode] << setw(10) << myid << endl;
 			}
 			/*for (int inode = 0; inode < InteractnNode; inode++)
 			{
@@ -342,10 +344,10 @@ int FEMOOP::Solve(int istep)
 			}*/
 			Pres[istep].ApplyInterDisp(InteractLoad, GlobalStiffMatrix, TotalDegreeOfFreedom, nnode, 2, nelem, InteractDisplacement, InteractResult, InteractNode);
 		}
-		//for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-		//{
-		//	DispLoad[iFreedom] += InteractLoad[iFreedom];
-		//}
+		for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+		{
+			DispLoad[iFreedom] += InteractLoad[iFreedom];
+		}
 		for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 		{
 			  InitialDisplace[istep][iFreedom]+=InteractDisplacement[iFreedom];
@@ -377,7 +379,7 @@ int FEMOOP::Solve(int istep)
 		ErrorSum = ErrorSum / TotalDegreeOfFreedom;
 		Error = Error / ErrorSum;
 		chk << setw(20) << "Load Error=" << setw(10) << Error << endl;
-	}while (Error > 1e-11);
+	}while (Error > 1e-11);                    
 	Elems.GetResult(RightHand[istep]);
 	Elems.GetInitialDisplacement(InitialDisplace[istep]);
 	Nodes.SetZero("All");
