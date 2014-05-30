@@ -340,15 +340,15 @@ int Displacement::ApplyDisp(double *LoadMatrix, int *DegreeOfFreedom, int TotalD
 	
 	return 0;
 }
-int Prescribe::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode)
+int Prescribe::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int *DegreeOfFreedom, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode)
 {
 	for (int iInteract = 0; iInteract < nInteract; iInteract++)
 	{
-		Interact[iInteract].ApplyInterDisp(LoadMatrix, StiffMatrix, TotalDegreeOfFreedom, TotalNode, NodeDof, nelem, InitialDisplacement, InteractResult, Interactnode);
+		Interact[iInteract].ApplyInterDisp(LoadMatrix, StiffMatrix,DegreeOfFreedom, TotalDegreeOfFreedom, TotalNode, NodeDof, nelem, InitialDisplacement, InteractResult, Interactnode);
 	}
 	return 0;
 }
-int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode)
+int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,int *DegreeOfFreedom, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode)
 {
 	double *NodeDisplacement, *DispLoad, *A;
 	//double **StiffMatrix;
@@ -372,7 +372,8 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, 
 			nDispDof++;
 			//DispDof[NodeIndex * 2 + idim] = nDispDof;
 			NodeDisplacement[inode * 2 + idim] = InteractResult[inode * 2 + idim];
-			InitialDisplacement[NodeIndex * 2 + idim] = InteractResult[inode * 2 + idim];
+			iDof = DegreeOfFreedom[NodeIndex * 2 + idim]-1;
+			InitialDisplacement[iDof] = InteractResult[inode * 2 + idim];
 		}
 	}
 	//Elems.FillDof(DispDof);

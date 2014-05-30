@@ -42,7 +42,7 @@ public:
 	int GetNode(int inode); 
 	int GetInteractNode(int inode);
 	int GetInteractDomain();
-	int ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode);
+	int ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int *DegreeOfFreedom, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode);
 };
 class Prescribe
 {
@@ -57,7 +57,7 @@ public:
 	int ReadFile(ifstream &pre);
 	int FixDof(int *DegreeOfFreedom, int n);
 	int ApplyDisp(double *LoadMatrix, int *DegreeOfFreedom, int TotalDegreeOfFreedom, int TotalNode, int NodeDof,int nelem,double *InitialDisplacement );
-	int ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode);
+	int ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int *DegreeOfFreedom, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode);
 	int GetnInteract();
 	int GetInteractProcess(int iInteract);
 	int GetInteractnNode(int iInteract);
