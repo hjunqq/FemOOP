@@ -413,11 +413,11 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	trana = 'N';
 	tranb = 'N';
 	int lda, ldb, ldc;
-	m = TotalDegreeOfFreedom; n = 1; k = nDispDof;
+	m = TotalDegreeOfFreedom; n = 1; k = TotalDegreeOfFreedom;
 	lda = max(1, m); ldb = max(1, k); ldc = max(1, m);
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
-		for (int jFreedom = 0; jFreedom < nDispDof; jFreedom++)
+		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
 		{
 			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = StiffMatrix[iFreedom][jFreedom];
 			//cout << setw(12) << StiffMatrix[iFreedom][jFreedom];

@@ -205,19 +205,19 @@ int FEMOOP::Solve(int istep)
 			}
 			Nodes.SetZero("All");
 			Elems.ElementLoad(InitialForce0);
-			cout << setw(15) << "LoadMatrix"
-				<< setw(15) << "DispLoad"
-				<< setw(15) << "InitialForce"
-				<< setw(15) << "InitialForce0"
-				<< setw(15) << "RightHand0" << endl;
+			//cout << setw(15) << "LoadMatrix"
+			//	<< setw(15) << "DispLoad"
+			//	<< setw(15) << "InitialForce"
+			//	<< setw(15) << "InitialForce0"
+			//	<< setw(15) << "RightHand0" << endl;
 			for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 			{
 				RightHand0[iFreedom] = LoadMatrix[istep][iFreedom] + DispLoad[iFreedom] + InitialForce[iFreedom] - InitialForce0[iFreedom];
-				cout << setw(15) << LoadMatrix[istep][iFreedom]
-					<< setw(15) << DispLoad[iFreedom]
-					<< setw(15) << InitialForce[iFreedom]
-					<< setw(15) << InitialForce0[iFreedom]
-					<< setw(15) << RightHand0[iFreedom] << endl;
+				//cout << setw(15) << LoadMatrix[istep][iFreedom]
+				//	<< setw(15) << DispLoad[iFreedom]
+				//	<< setw(15) << InitialForce[iFreedom]
+				//	<< setw(15) << InitialForce0[iFreedom]
+				//	<< setw(15) << RightHand0[iFreedom] << endl;
 			}
 
 			info = LAPACKE_dgetrs(LAPACK_COL_MAJOR, trana, TotalDegreeOfFreedom, 1, A, TotalDegreeOfFreedom, ipiv, RightHand0, TotalDegreeOfFreedom);
@@ -234,18 +234,18 @@ int FEMOOP::Solve(int istep)
 			Elems.ElementLoad(InitialForce1);
 
 			Error = 0;
-			cout << setw(15) << "LoadMatrix"
-				<< setw(15) << "InitialForce"
-				<< setw(15) << "DispLoad"
-				<< setw(15) << "InitialForce1" << setw(10)<<myid<<endl;
+			//cout << setw(15) << "LoadMatrix"
+			//	<< setw(15) << "InitialForce"
+			//	<< setw(15) << "DispLoad"
+			//	<< setw(15) << "InitialForce1" << setw(10)<<myid<<endl;
 			for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 			{
 				//Error += pow((LoadMatrix[istep][iFreedom] + InitialForce[iFreedom] + DispLoad[iFreedom] + InitialForce0[iFreedom] - InitialForce1[iFreedom]), 2);
 				Error += pow((LoadMatrix[istep][iFreedom] + InitialForce[iFreedom] + DispLoad[iFreedom] - InitialForce1[iFreedom]), 2);
-				cout << setw(15) << LoadMatrix[istep][iFreedom]
-					<< setw(15) << InitialForce[iFreedom]
-					<< setw(15) << DispLoad[iFreedom]
-					<< setw(15) << InitialForce1[iFreedom] << endl;
+				//cout << setw(15) << LoadMatrix[istep][iFreedom]
+				//	<< setw(15) << InitialForce[iFreedom]
+				//	<< setw(15) << DispLoad[iFreedom]
+				//	<< setw(15) << InitialForce1[iFreedom] << endl;
 				ErrorSum += pow((LoadMatrix[istep][iFreedom] + InitialForce[iFreedom] + DispLoad[iFreedom]), 2);
 				InitialForce1[iFreedom] = 0;
 			}
@@ -269,6 +269,7 @@ int FEMOOP::Solve(int istep)
 		{
 			InteractLoad[iFreedom] = 0;
 		}
+		cout << setw(20) << "Initial Displacement" <<setw(10)<< myid << endl;
 		for (int iInteract = 0; iInteract < nInteract; iInteract++)
 		{
 			InteractnNode = Pres[istep].GetInteractnNode(iInteract);
@@ -282,10 +283,13 @@ int FEMOOP::Solve(int istep)
 				int NodeIndex = InteractNode[inode];
 				for (int idim = 0; idim < ndim; idim++)
 				{
+				//int idim = 0;
 					if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
 					{
+						//cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] ;
 						InteractResult[inode * 2 + idim] = RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1];
-						RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] -= InteractResult[inode * 2 + idim];
+						/*RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] -= InteractResult[inode * 2 + idim];*/
+						cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] << setw(10) << myid << endl;
 					}
 					else
 					{
@@ -298,10 +302,10 @@ int FEMOOP::Solve(int istep)
 			tag2 = 2;
 			//MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
 			//MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
-			//MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
-			//MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
-			//MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
-			//MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
+			MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
+			MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
+			MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
+			MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
 			//InteractNode = Pres[istep].GetNode(iInteract);
 			//for (int inode = 0; inode < InteractnNode; inode++)
 			//{
@@ -318,38 +322,38 @@ int FEMOOP::Solve(int istep)
 			for (int inode = 0; inode < InteractnNode; inode++)
 			{
 				int NodeIndex = InteractNode[inode]; 
-				int idim = 0;
-				//for (int idim = 0; idim < ndim; idim++)
-				//{
-					InteractResult[inode * 2 + idim] = InteractResult[inode * 2 + idim];
-					InteractResult[inode * 2+1] = 0;
-						//-= (InteractResult[inode * 2 + idim] - InteractReceive[inode * 2 + idim]) / 2;
+				for (int idim = 0; idim < ndim; idim++)
+				{
+					InteractResult[inode * 2 + idim] = (InteractResult[inode * 2 + idim] + InteractReceive[inode * 2 + idim]) / 2;
 					//cout << InteractResult[inode * 2 + idim]<<endl;
-				//}
+				}
 			}
 			for (int inode = 0; inode < InteractnNode; inode++)
 			{
 				//cout << InteractResult[inode] << setw(10) << myid << endl;
 			}
-			/*for (int inode = 0; inode < InteractnNode; inode++)
+
+
+			cout << setw(20) << "Modify Displacement" << setw(10) << myid << endl;
+			for (int inode = 0; inode < InteractnNode; inode++)
 			{
 				int NodeIndex = InteractNode[inode];
 				for (int idim = 0; idim < ndim; idim++)
 				{
 					if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
 					{
-						RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] =
-							(InteractResult[inode * 2 + idim] + InteractReceive[inode * 2 + idim]) / 2;
+						RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1]=InteractResult[inode * 2 + idim];
+						cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] << setw(10) << myid << endl;
 					}
 				}
-			}*/
+			}
 			Pres[istep].ApplyInterDisp(InteractLoad, GlobalStiffMatrix, DegreeOfFreedom, TotalDegreeOfFreedom, nnode, 2, nelem, InteractDisplacement, InteractResult, InteractNode);
 		}
-		cout << "Dload" << endl;
+		cout <<setw(10)<< "Dload" << endl;
 		for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 		{
 			DispLoad[iFreedom] += InteractLoad[iFreedom];
-			cout << InteractLoad[iFreedom]<<endl;
+			cout << setw(10)<<InteractLoad[iFreedom]<<endl;
 		}
 		//for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 		//{
@@ -383,6 +387,16 @@ int FEMOOP::Solve(int istep)
 		Error = Error / ErrorSum;
 		chk << setw(20) << "Load Error=" << setw(10) << Error << endl;
 		cout << setw(20) << "Load Error=" << setw(10) << Error << endl;
+		if (myid == 0)
+		{
+			char a;
+			cin >> a;
+			MPI::COMM_WORLD.Barrier();
+		}
+		else
+		{
+			MPI::COMM_WORLD.Barrier();
+		}
 	}while (Error > 1e-11);                    
 	Elems.GetResult(RightHand[istep]);
 	Elems.GetInitialDisplacement(InitialDisplace[istep]);
