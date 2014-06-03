@@ -324,8 +324,8 @@ int FEMOOP::Solve(int istep)
 				int NodeIndex = InteractNode[inode]; 
 				for (int idim = 0; idim < ndim; idim++)
 				{
-					InteractResult[inode * 2 + idim] = (InteractResult[inode * 2 + idim] + InteractReceive[inode * 2 + idim]) / 2;
-					//cout << InteractResult[inode * 2 + idim]<<endl;
+					InteractResult[inode * 2 + idim] = (InteractReceive[inode * 2 + idim]-InteractResult[inode * 2 + idim] ) / 2;
+					cout << setw(20)<<InteractResult[inode * 2 + idim]<<setw(10)<<myid <<endl;
 				}
 			}
 			for (int inode = 0; inode < InteractnNode; inode++)
