@@ -1,2 +1,39 @@
 Project file located at 3\3_1\1
-Current Time 2014-5-3   9:45:35
+Current Time 2014-5-3   9:53:46
+Current Time 2014-5-3   9:53:46
+Current Time 2014-5-3   9:53:46
+Current Time 2014-5-3   9:53:46
+               istep         0           iteration         1
+         Load Error=1.08314e-030
+         Load Error=   1.49442
+               istep         0           iteration         2
+         Load Error=7.27678e-031
+         Load Error=8.43704e-031
+Current Time 2014-5-3   9:53:51
+     Index          Dispx          Dispy          Dispz
+         0              0              0
+         1   9.02545e-005              0
+         2   5.42101e-020              0
+         3              0   -0.000123622
+         4   5.18838e-005   -0.000236231
+         5              0  -4.01049e-005
+         6              0  -5.35156e-005
+         7   1.15868e-005   -0.000630206
+         8   6.77626e-020   7.95011e-005
+     Index          Dispx          Dispy          Dispz
+         0              0              0
+         1   9.02545e-005              0
+         2   5.42101e-020              0
+         3              0   -0.000123622
+         4   5.18838e-005   -0.000236231
+         5              0  -4.01049e-005
+         6              0  -5.35156e-005
+         7   1.15868e-005   -0.000630206
+         8   6.77626e-020   7.95011e-005
+     Index       StressXX       StressYY       StressXY
+         0        12725.3        -191791       -25517.5
+         1       -84490.8        -166177        20779.5
+         2       -12725.3        -177461        -112430
+         3       -54759.4        -159155         126772
+Current Time 2014-5-3   9:53:51
+Current Time 2014-5-3   9:53:51
