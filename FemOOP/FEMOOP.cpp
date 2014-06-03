@@ -281,31 +281,31 @@ int FEMOOP::Solve(int istep)
 			for (int inode = 0; inode < InteractnNode; inode++)
 			{
 				int NodeIndex = InteractNode[inode];
-				//for (int idim = 0; idim < ndim; idim++)
-				//{
-				int idim = 0;
+				for (int idim = 0; idim < ndim; idim++)
+				{
+				//int idim = 0;
 					if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
 					{
-						cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] ;
+						//cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] ;
 						InteractResult[inode * 2 + idim] = RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1];
-						RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] -= InteractResult[inode * 2 + idim];
-						cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] << setw(10) << myid << endl;
+						//RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] -= InteractResult[inode * 2 + idim];
+						cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
 					}
 					else
 					{
 						InteractResult[inode * 2 + idim] = 0;
 					}
 					//cout <<setw(15)<< InteractResult[inode * 2 +idim] << endl;
-				//}
+				}
 			}
 			tag1 = 1;
 			tag2 = 2;
 			//MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
 			//MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
-			//MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
-			//MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
-			//MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
-			//MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
+			MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
+			MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
+			MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
+			MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
 			//InteractNode = Pres[istep].GetNode(iInteract);
 			//for (int inode = 0; inode < InteractnNode; inode++)
 			//{
@@ -324,7 +324,7 @@ int FEMOOP::Solve(int istep)
 				int NodeIndex = InteractNode[inode]; 
 				for (int idim = 0; idim < ndim; idim++)
 				{
-					//InteractResult[inode * 2 + idim] = (InteractResult[inode * 2 + idim] + InteractReceive[inode * 2 + idim]) / 2;
+					InteractResult[inode * 2 + idim] = (InteractResult[inode * 2 + idim] + InteractReceive[inode * 2 + idim]) / 2;
 					//cout << InteractResult[inode * 2 + idim]<<endl;
 				}
 			}
@@ -334,20 +334,20 @@ int FEMOOP::Solve(int istep)
 			}
 
 
-			cout << setw(20) << "Modify Displacement" << setw(10) << myid << endl;
-			for (int inode = 0; inode < InteractnNode; inode++)
-			{
-				int NodeIndex = InteractNode[inode];
-				int idim = 0;
-				//for (int idim = 0; idim < ndim; idim++)
-				//{
-					if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
-					{
-						RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1]=InteractResult[inode * 2 + idim];
-						cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] << setw(10) << myid << endl;
-					}
-				//}
-			}
+			//cout << setw(20) << "Modify Displacement" << setw(10) << myid << endl;
+			//for (int inode = 0; inode < InteractnNode; inode++)
+			//{
+			//	int NodeIndex = InteractNode[inode];
+			//	int idim = 0;
+			//	//for (int idim = 0; idim < ndim; idim++)
+			//	//{
+			//		if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
+			//		{
+			//			RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1]=InteractResult[inode * 2 + idim];
+			//			cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] << setw(10) << myid << endl;
+			//		}
+			//	//}
+			//}
 			Pres[istep].ApplyInterDisp(InteractLoad, GlobalStiffMatrix, DegreeOfFreedom, TotalDegreeOfFreedom, nnode, 2, nelem, InteractDisplacement, InteractResult, InteractNode);
 		}
 		cout <<setw(10)<< "Dload" << endl;
