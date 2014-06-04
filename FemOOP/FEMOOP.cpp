@@ -180,9 +180,9 @@ int FEMOOP::Solve(int istep)
 		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
 		{
 			A[iFreedom*TotalDegreeOfFreedom + jFreedom] = GlobalStiffMatrix[iFreedom][jFreedom];
-			//chk << setw(15) << GlobalStiffMatrix[iFreedom][jFreedom];
+			chk << setw(15) << GlobalStiffMatrix[iFreedom][jFreedom];
 		}
-		//chk << endl;
+		chk << endl;
 	}
 	if (istep == 0)
 	{
@@ -284,16 +284,34 @@ int FEMOOP::Solve(int istep)
 				for (int idim = 0; idim < ndim; idim++)
 				{
 				//int idim = 0;
-					if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
+					if (numprocs > 1)
 					{
-						//cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] ;
-						InteractResult[inode * 2 + idim] = RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1];
-						//RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] -= InteractResult[inode * 2 + idim];
-						cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
+						if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
+						{
+							//cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] ;
+							InteractResult[inode * 2 + idim] = RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1];
+							//RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] -= InteractResult[inode * 2 + idim];
+							cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
+						}
+						else
+						{
+							InteractResult[inode * 2 + idim] = 0;
+						}
 					}
 					else
 					{
-						InteractResult[inode * 2 + idim] = 0;
+						int idim = 0; 
+						if (DegreeOfFreedom[NodeIndex * 2 + idim] != 0)
+						{
+							//cout << setw(20) << RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] ;
+							InteractResult[inode * 2 + idim] = RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1];
+							//RightHand[istep][DegreeOfFreedom[NodeIndex * 2 + idim] - 1] -= InteractResult[inode * 2 + idim];
+							cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
+						}
+						else
+						{
+							InteractResult[inode * 2 + idim] = 0;
+						}
 					}
 					//cout <<setw(15)<< InteractResult[inode * 2 +idim] << endl;
 				}
@@ -302,10 +320,14 @@ int FEMOOP::Solve(int istep)
 			tag2 = 2;
 			//MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
 			//MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, 0, tag1);
-			MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
-			MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
-			MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
-			MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
+			if (numprocs > 1)
+			{
+				MPI::COMM_WORLD.Send(InteractResult, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1); 
+				MPI::COMM_WORLD.Recv(InteractReceive, InteractnNode*ndim, MPI::DOUBLE, InteractProcess, tag1);
+				MPI::COMM_WORLD.Send(InteractNode, InteractnNode, MPI::INT, InteractProcess, tag2);
+				MPI::COMM_WORLD.Recv(InteractNodeReceive, InteractnNode, MPI::INT, InteractProcess, tag2);
+			}
+			
 			//InteractNode = Pres[istep].GetNode(iInteract);
 			//for (int inode = 0; inode < InteractnNode; inode++)
 			//{
@@ -321,11 +343,21 @@ int FEMOOP::Solve(int istep)
 			}
 			for (int inode = 0; inode < InteractnNode; inode++)
 			{
-				int NodeIndex = InteractNode[inode]; 
-				for (int idim = 0; idim < ndim; idim++)
+				if (numprocs > 1)
 				{
-					InteractResult[inode * 2 + idim] = (InteractReceive[inode * 2 + idim]-InteractResult[inode * 2 + idim] ) / 2;
-					cout << setw(20)<<InteractResult[inode * 2 + idim]<<setw(10)<<myid <<endl;
+					int NodeIndex = InteractNode[inode];
+					for (int idim = 0; idim < ndim; idim++)
+					{
+						InteractResult[inode * 2 + idim] = (InteractReceive[inode * 2 + idim] - InteractResult[inode * 2 + idim]) / 2;
+						cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
+					}
+				}
+				else
+				{
+					int NodeIndex = InteractNode[inode];
+					int idim = 0;
+					InteractResult[inode * 2 + idim] = (InteractReceive[inode * 2 + idim] - InteractResult[inode * 2 + idim]) / 2;
+					cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
 				}
 			}
 			for (int inode = 0; inode < InteractnNode; inode++)

@@ -133,6 +133,7 @@ int Prescribe::ReadFile(ifstream &pre)
 		}
 		else if (text == "InteractBoundary")
 		{
+			stream.str("");
 			getline(pre, text);
 			stream << text;
 			stream >> nInteract;
@@ -351,25 +352,29 @@ int Prescribe::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix, int *De
 int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,int *DegreeOfFreedom, int TotalDegreeOfFreedom, int TotalNode, int NodeDof, int nelem, double *InitialDisplacement, double *InteractResult, int *Interactnode)
 {
 	double *NodeDisplacement, *DispLoad, *A;
-	//double **StiffMatrix;
+	double **DispStiffMatrix;
 	int NodeIndex, iDof, nDispDof, *DispDof;
 	NodeDisplacement = new double[nNode*2]();
 	DispLoad = new double[TotalDegreeOfFreedom]();
 	A = new double[TotalDegreeOfFreedom*TotalDegreeOfFreedom];
-
+	DispStiffMatrix = new double*[TotalDegreeOfFreedom];
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		DispStiffMatrix[iFreedom] = new double[TotalDegreeOfFreedom]();
+	}
 	int nDofMatrix = TotalNode*NodeDof;
 	//DispDof = new int[nDofMatrix]();
 	//for (int iFreedom = 0; iFreedom < nDofMatrix; iFreedom++)
 	//{
 	//	DispDof[iFreedom] = DegreeOfFreedom[iFreedom];
 	//}
-	nDispDof = 0;
+
 	for (int inode = 0; inode < nNode; inode++)
 	{
 		NodeIndex = Node[inode];
 		for (int idim = 0; idim < 2; idim++)
 		{
-			nDispDof++;
+			
 			//DispDof[NodeIndex * 2 + idim] = nDispDof;
 			NodeDisplacement[inode * 2 + idim] = InteractResult[inode * 2 + idim];
 			iDof = DegreeOfFreedom[NodeIndex * 2 + idim]-1;
@@ -426,6 +431,33 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	}
 
 	dgemm(&trana, &tranb, &m, &n, &k, &alpha, A, &lda, InitialDisplacement, &ldb, &beta, DispLoad, &ldc);
+	nDispDof = 0;
+	for (int inode = 0; inode < nNode; inode++)
+	{
+		NodeIndex = Node[inode];
+		for (int idim = 0; idim < 2; idim++)
+		{
+			iDof = DegreeOfFreedom[NodeIndex * 2 + idim] - 1;
+			if (InitialDisplacement[iDof] == 0)
+			{
+				nDispDof++;
+				DispLoad[iDof] = -DispLoad[iDof];
+			}
+		}
+	}
+	DispDof = new int(TotalDegreeOfFreedom);
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		if (DegreeOfFreedom[iFreedom] == 0 || InitialDisplacement[iDof] == 0)
+		{
+			DispDof[iFreedom] = 0;
+		}
+		else
+		{
+			DispDof[iFreedom] = 1;
+		}
+	}
+
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
 		LoadMatrix[iFreedom] -= DispLoad[iFreedom];
