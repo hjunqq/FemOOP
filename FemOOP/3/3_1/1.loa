@@ -1,5 +1,5 @@
 nloa,nface£¬nbody£¬ncent
-3 0 0 0
+3 0 0 1
 ntype
 face
 nele,nnode,dir,startcoor,endcoor,startval,endval  curve

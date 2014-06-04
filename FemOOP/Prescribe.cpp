@@ -354,10 +354,12 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	double *NodeDisplacement, *DispLoad, *A;
 	double **DispStiffMatrix;
 	int NodeIndex, iDof, nDispDof, *DispDof;
+	double *ForceDisp;
 	NodeDisplacement = new double[nNode*2]();
 	DispLoad = new double[TotalDegreeOfFreedom]();
 	A = new double[TotalDegreeOfFreedom*TotalDegreeOfFreedom];
 	DispStiffMatrix = new double*[TotalDegreeOfFreedom];
+	ForceDisp = new double[TotalDegreeOfFreedom]();
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
 		DispStiffMatrix[iFreedom] = new double[TotalDegreeOfFreedom]();
@@ -414,12 +416,14 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	double a, b, c;
 	char trana, tranb;
 	int m, n, k;
+	int *ipiv;
 	double alpha = 1.0, beta = 1.0;
 	trana = 'N';
 	tranb = 'N';
 	int lda, ldb, ldc;
 	m = TotalDegreeOfFreedom; n = 1; k = TotalDegreeOfFreedom;
 	lda = max(1, m); ldb = max(1, k); ldc = max(1, m);
+	ipiv = new int[TotalDegreeOfFreedom];
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
 		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
@@ -432,31 +436,87 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 
 	dgemm(&trana, &tranb, &m, &n, &k, &alpha, A, &lda, InitialDisplacement, &ldb, &beta, DispLoad, &ldc);
 	nDispDof = 0;
+	DispDof = new int[TotalDegreeOfFreedom]();
 	for (int inode = 0; inode < nNode; inode++)
 	{
 		NodeIndex = Node[inode];
 		for (int idim = 0; idim < 2; idim++)
 		{
 			iDof = DegreeOfFreedom[NodeIndex * 2 + idim] - 1;
-			if (InitialDisplacement[iDof] == 0)
+			if (InitialDisplacement[iDof] != 0)
 			{
 				nDispDof++;
+				DispDof[iDof] = 1;
 				DispLoad[iDof] = -DispLoad[iDof];
 			}
 		}
 	}
-	DispDof = new int(TotalDegreeOfFreedom);
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
-		if (DegreeOfFreedom[iFreedom] == 0 || InitialDisplacement[iDof] == 0)
+		DispLoad[iFreedom] = -DispLoad[iFreedom];
+	}
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		if (DispDof[iFreedom] != 0)
 		{
-			DispDof[iFreedom] = 0;
+			for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
+			{
+				DispStiffMatrix[iFreedom][jFreedom] = 0;
+				if (iFreedom == jFreedom)
+				{
+					DispStiffMatrix[iFreedom][jFreedom] = 1;
+				}
+			}
 		}
 		else
 		{
-			DispDof[iFreedom] = 1;
+			for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
+			{
+				DispStiffMatrix[iFreedom][jFreedom] = StiffMatrix[iFreedom][jFreedom];
+				if (DispDof[jFreedom] != 0)
+				{
+					DispStiffMatrix[iFreedom][jFreedom] = 0;
+				}
+			}
 		}
 	}
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
+		{
+			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = DispStiffMatrix[iFreedom][jFreedom];
+			//cout << setw(12) << StiffMatrix[iFreedom][jFreedom];
+		}
+		//cout << endl;
+	}
+	for (int iFreedom = 0; iFreedom< TotalDegreeOfFreedom; iFreedom++)
+	{
+		ForceDisp[iFreedom] = DispLoad[iFreedom];
+	}
+	int info = LAPACKE_dgesv(LAPACK_COL_MAJOR, TotalDegreeOfFreedom, 1, A, TotalDegreeOfFreedom, ipiv, ForceDisp, TotalDegreeOfFreedom);
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		if (InitialDisplacement[iFreedom] == 0)
+		{
+			InitialDisplacement[iFreedom] = ForceDisp[iFreedom];
+		}
+	}
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		DispLoad[iFreedom] = 0;
+	}
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
+		{
+			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = StiffMatrix[iFreedom][jFreedom];
+			//cout << setw(12) << StiffMatrix[iFreedom][jFreedom];
+		}
+		//cout << endl;
+	}
+
+	dgemm(&trana, &tranb, &m, &n, &k, &alpha, A, &lda, InitialDisplacement, &ldb, &beta, DispLoad, &ldc);
+
 
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{

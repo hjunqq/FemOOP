@@ -356,7 +356,7 @@ int FEMOOP::Solve(int istep)
 				{
 					int NodeIndex = InteractNode[inode];
 					int idim = 0;
-					InteractResult[inode * 2 + idim] = (InteractReceive[inode * 2 + idim] - InteractResult[inode * 2 + idim]) / 2;
+					InteractResult[inode * 2 + idim] =  - InteractResult[inode * 2 + idim];
 					cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
 				}
 			}
