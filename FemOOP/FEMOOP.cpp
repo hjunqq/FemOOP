@@ -205,19 +205,19 @@ int FEMOOP::Solve(int istep)
 			}
 			Nodes.SetZero("All");
 			Elems.ElementLoad(InitialForce0);
-			//cout << setw(15) << "LoadMatrix"
-			//	<< setw(15) << "DispLoad"
-			//	<< setw(15) << "InitialForce"
-			//	<< setw(15) << "InitialForce0"
-			//	<< setw(15) << "RightHand0" << endl;
+			cout << setw(15) << "LoadMatrix"
+				<< setw(15) << "DispLoad"
+				<< setw(15) << "InitialForce"
+				<< setw(15) << "InitialForce0"
+				<< setw(15) << "RightHand0" << endl;
 			for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 			{
 				RightHand0[iFreedom] = LoadMatrix[istep][iFreedom] + DispLoad[iFreedom] + InitialForce[iFreedom] - InitialForce0[iFreedom];
-				//cout << setw(15) << LoadMatrix[istep][iFreedom]
-				//	<< setw(15) << DispLoad[iFreedom]
-				//	<< setw(15) << InitialForce[iFreedom]
-				//	<< setw(15) << InitialForce0[iFreedom]
-				//	<< setw(15) << RightHand0[iFreedom] << endl;
+				cout << setw(15) << LoadMatrix[istep][iFreedom]
+					<< setw(15) << DispLoad[iFreedom]
+					<< setw(15) << InitialForce[iFreedom]
+					<< setw(15) << InitialForce0[iFreedom]
+					<< setw(15) << RightHand0[iFreedom] << endl;
 			}
 
 			info = LAPACKE_dgetrs(LAPACK_COL_MAJOR, trana, TotalDegreeOfFreedom, 1, A, TotalDegreeOfFreedom, ipiv, RightHand0, TotalDegreeOfFreedom);
@@ -353,7 +353,7 @@ int FEMOOP::Solve(int istep)
 		cout <<setw(10)<< "Dload" << endl;
 		for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 		{
-			DispLoad[iFreedom] += InteractLoad[iFreedom];
+			DispLoad[iFreedom] -= InteractLoad[iFreedom];
 			cout << setw(10)<<InteractLoad[iFreedom]<<endl;
 		}
 		//for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
