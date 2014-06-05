@@ -1,8 +1,8 @@
 Project file located at 3\3_1\1
-Current Time 2014-5-5  22:33:42
-Current Time 2014-5-5  22:33:42
-Current Time 2014-5-5  22:33:42
-Current Time 2014-5-5  22:33:42
+Current Time 2014-5-6   1:13:37
+Current Time 2014-5-6   1:13:37
+Current Time 2014-5-6   1:13:37
+Current Time 2014-5-6   1:13:37
    1.90006e+009              0  -3.99586e+008              0              0              0
               0   2.65059e+009              0  -2.05077e+009              0              0
   -3.99586e+008              0   3.80012e+009              0  -3.99586e+008              0
@@ -11,3 +11,4 @@ Current Time 2014-5-5  22:33:42
               0              0              0  -2.05077e+009              0   2.65059e+009
                istep         0           iteration         1
          Load Error=3.25261e-031
+         Load Error=   1.40561

@@ -383,17 +383,18 @@ int FEMOOP::Solve(int istep)
 			//}
 			Pres[istep].ApplyInterDisp(InteractLoad, GlobalStiffMatrix, DegreeOfFreedom, TotalDegreeOfFreedom, nnode, 2, nelem, InteractDisplacement, InteractResult, InteractNode);
 			Elems.GetInteractDisp(InteractResult, InteractNode, InteractnNode);
+			//for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+			//{
+			//	InitialDisplace[istep][iFreedom] += InteractDisplacement[iFreedom];
+			//}	
 			for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 			{
-				InitialDisplace[istep][iFreedom] += InteractDisplacement[iFreedom];
+				DispLoad[iFreedom] -= InteractLoad[iFreedom];
+				cout << setw(10)<<InteractLoad[iFreedom]<<endl;
 			}
 		}
-		cout <<setw(10)<< "Dload" << endl;
-		for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-		{
-			DispLoad[iFreedom] -= InteractLoad[iFreedom];
-			cout << setw(10)<<InteractLoad[iFreedom]<<endl;
-		}
+		//cout <<setw(10)<< "Dload" << endl;
+
 
 
 		//double *zero;
