@@ -296,6 +296,26 @@ int Quadrilateral::GetInitialDisplacement(double *InitialDisplacement)
 	}
 	return 0;
 }
+int Quadrilateral::GetInteractDisp(double *InteractDisp, int *InteractNode, int nInteractNode)
+{
+	for (int inode = 0; inode < 4; inode++)
+	{
+		for (int idim = 0; idim < 2; idim++)
+		{
+			for (int iInterNode = 0; iInterNode < nInteractNode; iInterNode++)
+			{
+				if (Node[inode] == InteractNode[iInterNode])
+				{
+					for (int idim = 0; idim < 2; idim++)
+					{
+						Result[inode * 2+idim] = InteractDisp[iInterNode * 2+idim];
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
 int Element::GetInitialDisplacement(double *InitialDisplacement)
 {
 	int nelem = Type.size();
@@ -304,6 +324,18 @@ int Element::GetInitialDisplacement(double *InitialDisplacement)
 		if (Type[ielem] == 4)
 		{
 			Quadrs[Index[ielem]].GetInitialDisplacement(InitialDisplacement);
+		}
+	}
+	return 0;
+}
+int Element::GetInteractDisp(double *InteractDisp, int *InteractNode, int nInteractNode)
+{
+	int nelem = Type.size();
+	for (int ielem = 0; ielem < nelem; ielem++)
+	{
+		if (Type[ielem] == 4)
+		{
+			Quadrs[Index[ielem]].GetInteractDisp(InteractDisp,InteractNode,nInteractNode);
 		}
 	}
 	return 0;
@@ -430,11 +462,16 @@ int Quadrilateral::ElementStress()
 		}
 		
 	}
+	double *disp;
+	disp = new double[2];
 	for (int i = 0; i < 4; i++)
 	{
+		disp[0] = Result[Node[i]*2];
+		disp[1] = Result[Node[i] * 2 + 1];
 		Nodes.PutResult(Node[i], NULL, "Time");
 		Nodes.PutResult(Node[i], NodeStrain[i], "Strain");
 		Nodes.PutResult(Node[i], NodeStress[i], "Stress");
+		Nodes.PutResult(Node[i], disp, "Disp");
 	}
 	return 0;
 }

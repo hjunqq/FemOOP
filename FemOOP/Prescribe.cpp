@@ -212,20 +212,20 @@ int Prescribe::FixDof(int *DegreeOfFreedom, int n)
 				}
 			}
 		}
-		//else if (type.at(ipre) == "InteractBoundary")
-		//{
-		//	int nBoundary = Interact.size();
-		//	for (int iBoundary = 0; iBoundary < nBoundary; iBoundary++)
-		//	{
-		//		int nnode = Interact[iBoundary].GetNnode();
-		//		for (int inode = 0; inode < nnode; inode++)
-		//		{
-		//			int node = Interact[iBoundary].GetNode(inode);
-		//			DegreeOfFreedom[node * 2] = 0;
-		//			DegreeOfFreedom[node * 2 + 1] = 0;
-		//		}
-		//	}
-		//}
+		else if (type.at(ipre) == "InteractBoundary")
+		{
+			int nBoundary = Interact.size();
+			for (int iBoundary = 0; iBoundary < nBoundary; iBoundary++)
+			{
+				int nnode = Interact[iBoundary].GetNnode();
+				for (int inode = 0; inode < nnode; inode++)
+				{
+					int node = Interact[iBoundary].GetNode(inode);
+					DegreeOfFreedom[node * 2] = 0;
+					DegreeOfFreedom[node * 2 + 1] = 0;
+				}
+			}
+		}
 		else if (type.at(ipre) == "Displacement")
 		{
 			int nnode = Disp[Index[ipre]].GetNnode();
@@ -365,35 +365,45 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 		DispStiffMatrix[iFreedom] = new double[TotalDegreeOfFreedom]();
 	}
 	int nDofMatrix = TotalNode*NodeDof;
-	//DispDof = new int[nDofMatrix]();
-	//for (int iFreedom = 0; iFreedom < nDofMatrix; iFreedom++)
-	//{
-	//	DispDof[iFreedom] = DegreeOfFreedom[iFreedom];
-	//}
+	DispDof = new int[nDofMatrix]();
+	for (int iFreedom = 0; iFreedom < nDofMatrix; iFreedom++)
+	{
+		DispDof[iFreedom] = DegreeOfFreedom[iFreedom];
+	}
+
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
 		InitialDisplacement[iFreedom] = 0;
+	}
+	nDispDof = TotalDegreeOfFreedom;
+	for (int inode = 0; inode < nNode; inode++)
+	{
+		NodeIndex = Node[inode];
+		for (int idim = 0; idim < 2; idim++)
+		{
+			nDispDof++;
+			DispDof[NodeIndex * 2 + idim] = nDispDof;
+			NodeDisplacement[inode * 2 + idim] = InteractResult[inode * 2 + idim];
+		}
 	}
 	for (int inode = 0; inode < nNode; inode++)
 	{
 		NodeIndex = Node[inode];
 		for (int idim = 0; idim < 2; idim++)
 		{
-			
-			//DispDof[NodeIndex * 2 + idim] = nDispDof;
-			NodeDisplacement[inode * 2 + idim] = InteractResult[inode * 2 + idim];
-			iDof = DegreeOfFreedom[NodeIndex * 2 + idim]-1;
+			iDof = DispDof[NodeIndex * 2 + idim] - 1;
 			InitialDisplacement[iDof] = InteractResult[inode * 2 + idim];
 		}
 	}
-	//Elems.FillDof(DispDof);
-	//nDispDof -= TotalDegreeOfFreedom;
+	Elems.FillDof(DispDof);
+	nDispDof -= TotalDegreeOfFreedom;
 	int iedof, jedof, *Dof;
-	/*double **Stiff;
-	StiffMatrix = new double*[TotalDegreeOfFreedom];
+	
+	double **Stiff;
+	DispStiffMatrix = new double*[TotalDegreeOfFreedom];
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
-		StiffMatrix[iFreedom] = new double[nDispDof]();
+		DispStiffMatrix[iFreedom] = new double[nDispDof]();
 	}
 	for (int ielem = 0; ielem < nelem; ielem++)
 	{
@@ -409,13 +419,13 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 				{
 					if (jedof>TotalDegreeOfFreedom &&iedof <= TotalDegreeOfFreedom)
 					{
-						StiffMatrix[iedof - 1][jedof - 1 - TotalDegreeOfFreedom] += Stiff[idof][jdof];
+						DispStiffMatrix[iedof - 1][jedof - 1 - TotalDegreeOfFreedom] += Stiff[idof][jdof];
 					}
 				}
 			}
 		}
 	}
-	Elems.FillDof(DegreeOfFreedom);*/
+	Elems.FillDof(DegreeOfFreedom);
 	double a, b, c;
 	char trana, tranb;
 	int m, n, k;
@@ -424,12 +434,12 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	trana = 'N';
 	tranb = 'N';
 	int lda, ldb, ldc;
-	m = TotalDegreeOfFreedom; n = 1; k = TotalDegreeOfFreedom;
+	m = TotalDegreeOfFreedom; n = 1; k = nDispDof;
 	lda = max(1, m); ldb = max(1, k); ldc = max(1, m);
 	ipiv = new int[TotalDegreeOfFreedom];
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
-		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
+		for (int jFreedom = 0; jFreedom < nDispDof; jFreedom++)
 		{
 			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = StiffMatrix[iFreedom][jFreedom];
 			//cout << setw(12) << StiffMatrix[iFreedom][jFreedom];
@@ -437,90 +447,8 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 		//cout << endl;
 	}
 
-	dgemm(&trana, &tranb, &m, &n, &k, &alpha, A, &lda, InitialDisplacement, &ldb, &beta, DispLoad, &ldc);
-	nDispDof = 0;
-	DispDof = new int[TotalDegreeOfFreedom]();
-	for (int inode = 0; inode < nNode; inode++)
-	{
-		NodeIndex = Node[inode];
-		for (int idim = 0; idim < 2; idim++)
-		{
-			iDof = DegreeOfFreedom[NodeIndex * 2 + idim] - 1;
-			if (InitialDisplacement[iDof] != 0)
-			{
-				nDispDof++;
-				DispDof[iDof] = 1;
-				DispLoad[iDof] = -DispLoad[iDof];
-			}
-		}
-	}
-	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-	{
-		DispLoad[iFreedom] = -DispLoad[iFreedom];
-	}
-	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-	{
-		if (DispDof[iFreedom] != 0)
-		{
-			for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
-			{
-				DispStiffMatrix[iFreedom][jFreedom] = 0;
-				if (iFreedom == jFreedom)
-				{
-					DispStiffMatrix[iFreedom][jFreedom] = 1;
-				}
-			}
-		}
-		else
-		{
-			for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
-			{
-				DispStiffMatrix[iFreedom][jFreedom] = StiffMatrix[iFreedom][jFreedom];
-				if (DispDof[jFreedom] != 0)
-				{
-					DispStiffMatrix[iFreedom][jFreedom] = 0;
-				}
-			}
-		}
-	}
-	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-	{
-		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
-		{
-			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = DispStiffMatrix[iFreedom][jFreedom];
-			//cout << setw(12) << StiffMatrix[iFreedom][jFreedom];
-		}
-		//cout << endl;
-	}
-	for (int iFreedom = 0; iFreedom< TotalDegreeOfFreedom; iFreedom++)
-	{
-		ForceDisp[iFreedom] = DispLoad[iFreedom];
-	}
-	int info = LAPACKE_dgesv(LAPACK_COL_MAJOR, TotalDegreeOfFreedom, 1, A, TotalDegreeOfFreedom, ipiv, ForceDisp, TotalDegreeOfFreedom);
-	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-	{
-		if (InitialDisplacement[iFreedom] == 0)
-		{
-			InitialDisplacement[iFreedom] = ForceDisp[iFreedom];
-		}
-	}
-	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-	{
-		DispLoad[iFreedom] = 0;
-	}
-	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-	{
-		for (int jFreedom = 0; jFreedom < TotalDegreeOfFreedom; jFreedom++)
-		{
-			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = StiffMatrix[iFreedom][jFreedom];
-			//cout << setw(12) << StiffMatrix[iFreedom][jFreedom];
-		}
-		//cout << endl;
-	}
-
-	dgemm(&trana, &tranb, &m, &n, &k, &alpha, A, &lda, InitialDisplacement, &ldb, &beta, DispLoad, &ldc);
-
-
+	dgemm(&trana, &tranb, &m, &n, &k, &alpha, A, &lda, NodeDisplacement, &ldb, &beta, DispLoad, &ldc);
+	
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
 		LoadMatrix[iFreedom] -= DispLoad[iFreedom];

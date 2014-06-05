@@ -71,6 +71,7 @@ public:
 	int FillDof(int * DegreeOfFreedom);
 	int GetResult(double *Result);
 	int GetInitialDisplacement(double *InitialDisplacement);
+	int GetInteractDisp(double *InteractDisp, int *InteractNode, int nInteractNode);
 	int ElementStress();
 	int PrintStress(ofstream & outdist);
 	int PrintStress(ostream & outdist);
@@ -95,6 +96,7 @@ public:
 	int FillDof(int * DegreeOfFreedom);
 	int GetResult(double *Result);
 	int GetInitialDisplacement(double *InitialDisplacement);
+	int GetInteractDisp(double *InteractDisp,int *InteractNode,int nInteractNode);
 	int Ndof(int ielem);
 	int ElementStress();
 	int PrintStress(int ielem,ofstream & outdist);
