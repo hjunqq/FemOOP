@@ -370,7 +370,10 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	//{
 	//	DispDof[iFreedom] = DegreeOfFreedom[iFreedom];
 	//}
-
+	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+	{
+		InitialDisplacement[iFreedom] = 0;
+	}
 	for (int inode = 0; inode < nNode; inode++)
 	{
 		NodeIndex = Node[inode];
