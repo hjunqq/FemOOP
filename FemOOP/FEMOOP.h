@@ -44,7 +44,7 @@ public:
 	int TotalDOF(int istep,bool Rebuild);
 	int GlobalStiff();
 	int ApplyLoad(int istep);
-	int Solve(int istep);
+	int Solve(int istep) ;
 	int StrainForce();
 	int GIDOutResult(int istep);
 	int StepCycle();
