@@ -441,7 +441,7 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	{
 		for (int jFreedom = 0; jFreedom < nDispDof; jFreedom++)
 		{
-			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = StiffMatrix[iFreedom][jFreedom];
+			A[jFreedom*TotalDegreeOfFreedom + iFreedom] = DispStiffMatrix[iFreedom][jFreedom];
 			//cout << setw(12) << StiffMatrix[iFreedom][jFreedom];
 		}
 		//cout << endl;
@@ -451,7 +451,7 @@ int InteractBoundary::ApplyInterDisp(double *LoadMatrix, double  **StiffMatrix,i
 	
 	for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 	{
-		LoadMatrix[iFreedom] -= DispLoad[iFreedom];
+		LoadMatrix[iFreedom] += DispLoad[iFreedom];
 	}
 
 	return 0;

@@ -355,10 +355,14 @@ int FEMOOP::Solve(int istep)
 				}
 				else
 				{
-					int NodeIndex = InteractNode[inode];
-					int idim = 0;
-					InteractResult[inode * 2 + idim] = 0.0001; //- InteractResult[inode * 2 + idim];
-					cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
+					if (iteration < 2)
+					{
+						int NodeIndex = InteractNode[inode];
+						int idim = 0;
+						InteractResult[inode * 2 + idim] = 0.0001; //- InteractResult[inode * 2 + idim];
+						Elems.GetInteractDisp(InteractResult, InteractNode, InteractnNode);
+						cout << setw(20) << InteractResult[inode * 2 + idim] << setw(10) << myid << endl;
+					}
 				}
 			}
 			for (int inode = 0; inode < InteractnNode; inode++)
@@ -382,11 +386,11 @@ int FEMOOP::Solve(int istep)
 			//	//}
 			//}
 			Pres[istep].ApplyInterDisp(InteractLoad, GlobalStiffMatrix, DegreeOfFreedom, TotalDegreeOfFreedom, nnode, 2, nelem, InteractDisplacement, InteractResult, InteractNode);
-			Elems.GetInteractDisp(InteractResult, InteractNode, InteractnNode);
-			//for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
-			//{
-			//	InitialDisplace[istep][iFreedom] += InteractDisplacement[iFreedom];
-			//}	
+			
+			for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
+			{
+				InitialDisplace[istep][iFreedom] += InteractDisplacement[iFreedom];
+			}	
 			for (int iFreedom = 0; iFreedom < TotalDegreeOfFreedom; iFreedom++)
 			{
 				DispLoad[iFreedom] -= InteractLoad[iFreedom];
@@ -438,6 +442,7 @@ int FEMOOP::Solve(int istep)
 	}while (Error > 1e-11);                    
 	Elems.GetResult(RightHand[istep]);
 	Elems.GetInitialDisplacement(InitialDisplace[istep]);
+
 	Nodes.SetZero("All");
 	Elems.ElementStress();
 	Nodes.SetZero("Times");

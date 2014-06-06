@@ -75,7 +75,8 @@ int Node::PutResult(int inode, double *Value,string ValType)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			this->Disp[inode][i] += Value[i];			
+			Disp[inode][i] = Value[i];
+				//(Disp[inode][i] *( Nelem[inode] - 1) + Value[i]) / Nelem[inode];
 		}
 	}
 	else if (ValType == "Time")
@@ -104,8 +105,8 @@ int Node::PutResult(int inode, double *Value,string ValType)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			this->InternalForce[inode][i] += Value[i];
-			//	(this->InternalForce[inode][i] *(Nelem[inode] - 1) + Value[i])/ Nelem[inode];
+			this->InternalForce[inode][i] =
+				(this->InternalForce[inode][i] *(Nelem[inode] - 1) + Value[i])/ Nelem[inode];
 		}
 	}
 	return 0;
@@ -131,6 +132,10 @@ int Node::SetZero(string Type)
 				Stress[inode][i] = 0;
 				Strain[inode][i] = 0;
 				InternalForce[inode][i] = 0;
+			}
+			for (int i = 0; i < 2; i++)
+			{
+				Disp[inode][i] = 0;
 			}
 			Nelem[inode] = 0;
 		}

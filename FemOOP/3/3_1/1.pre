@@ -8,6 +8,11 @@ dir,npoint
 dir,npoint
 2 3
 1 4 7
+Displacement
+ 1
+dir value npoint
+ 1   -5e-5   3
+ 3 6 9
 InteractBoundary
 1
 npoint,InteractDomain

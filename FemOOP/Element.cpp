@@ -265,7 +265,7 @@ int Quadrilateral::GetResult(double *Result)
 {
 	for (int i = 0; i < 8; i++)
 	{
-		this->Result[i] = 0;
+		//this->Result[i] = 0;
 		if (Dof[i] != 0)
 		{
 			this->Result[i] = Result[Dof[i]-1];
@@ -466,8 +466,8 @@ int Quadrilateral::ElementStress()
 	disp = new double[2];
 	for (int i = 0; i < 4; i++)
 	{
-		disp[0] = Result[Node[i]*2];
-		disp[1] = Result[Node[i] * 2 + 1];
+		disp[0] = Result[i*2];
+		disp[1] = Result[i * 2 + 1];
 		Nodes.PutResult(Node[i], NULL, "Time");
 		Nodes.PutResult(Node[i], NodeStrain[i], "Strain");
 		Nodes.PutResult(Node[i], NodeStress[i], "Stress");
